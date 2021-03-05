@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Windows.Input;
 using EtherMon.Models;
 using EtherMon.ViewModels;
 using Xamarin.Forms;
@@ -9,7 +7,7 @@ using Xamarin.Forms.Xaml;
 namespace EtherMon.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class SettingsPage : ContentPage
+    public partial class SettingsPage
     {
         private readonly SettingsViewModel _viewModel;
         

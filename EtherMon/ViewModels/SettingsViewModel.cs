@@ -14,6 +14,7 @@ namespace EtherMon.ViewModels
         public List<MinerAddress> MinerAddresses { get; set; }
 
         private int _height;
+
         public int AddressesListHeight
         {
             get => _height;
@@ -24,7 +25,7 @@ namespace EtherMon.ViewModels
             }
         }
         
-        public ICommand DeleteCommand => new Command<MinerAddress>(async (MinerAddress address) =>
+        public ICommand DeleteCommand => new Command<MinerAddress>(async address =>
         {
             Debug.WriteLine("Executing delete command");
             await DeleteAddressFromDb(address.Id);

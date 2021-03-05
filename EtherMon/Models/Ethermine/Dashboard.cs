@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using EtherMon.Extensions;
 
 namespace EtherMon.Models.Ethermine
 {
@@ -11,9 +13,9 @@ namespace EtherMon.Models.Ethermine
     public class DashboardData
     {
         public List<DashboardDataStatistic> statistics { get; set; }
-        public List<DashboardDataWorker> workers { get; set; }
-        public DashboardDataCurrentStatistics currentStatistics { get; set; }
-        public DashboardDataSettings settings { get; set; }
+        public List<DashboardDataWorker>? workers { get; set; }
+        public DashboardDataCurrentStatistics? currentStatistics { get; set; }
+        public DashboardDataSettings? settings { get; set; }
     }
 
     public class DashboardDataStatistic

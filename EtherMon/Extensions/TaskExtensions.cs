@@ -7,7 +7,7 @@ namespace EtherMon.Extensions
     {
         public static async void SafeFireAndForget(this Task task,
             bool returnToCallingContext,
-            Action<Exception> onException = null)
+            Action<Exception>? onException = null)
         {
             try
             {

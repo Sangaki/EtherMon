@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="EtherMon.Views.FrontPage"
+             xmlns:converter="clr-namespace:EtherMon.Converters"
              xmlns:forms="clr-namespace:Microcharts.Forms;assembly=Microcharts.Forms">
     
     <RefreshView IsRefreshing="{Binding IsRefreshing}"
@@ -11,6 +12,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <StackLayout Orientation="Vertical" Padding="30,24,30,24" Spacing="10">
@@ -26,32 +28,35 @@
                                      Padding="0,0,0,0">
                             <Label Text="Hashrate,MHs"
                                    FontSize="14"
-                                   TextColor="Black" 
+                                   TextColor="White" 
                                    HorizontalTextAlignment="Center"
                                    VerticalTextAlignment="Center"/>
                         </StackLayout>
-                        <StackLayout Grid.Column="1">
+                        <StackLayout Grid.Column="1"
+                                     BackgroundColor="#77d065">
                             <Label Text="Current" 
-                                   TextColor="Black" 
+                                   TextColor="White" 
                                    HorizontalTextAlignment="Center"/>
                             <Label Text="{Binding Path=CurrentStats.data.currentHashrate}" 
-                                   TextColor="Black"
+                                   TextColor="White"
                                    HorizontalTextAlignment="Center" />
                         </StackLayout>
-                        <StackLayout Grid.Column="2" >
+                        <StackLayout Grid.Column="2"
+                                     BackgroundColor="#ffa500">
                             <Label Text="Average" 
-                                   TextColor="Black"
+                                   TextColor="White"
                                    HorizontalTextAlignment="Center"/>
                             <Label Text="{Binding Path=CurrentStats.data.averageHashrate}" 
-                                   TextColor="Black"
+                                   TextColor="White"
                                    HorizontalTextAlignment="Center" />
                         </StackLayout>
-                        <StackLayout Grid.Column="3" >
+                        <StackLayout Grid.Column="3"
+                                     BackgroundColor="#3498db">
                             <Label Text="Reported" 
-                                   TextColor="Black"
+                                   TextColor="White"
                                    HorizontalTextAlignment="Center" />
                             <Label Text="{Binding Path=CurrentStats.data.reportedHashrate}" 
-                                   TextColor="Black"
+                                   TextColor="White"
                                    HorizontalTextAlignment="Center" />
                         </StackLayout>
                     </Grid>
@@ -66,32 +71,35 @@
                                      VerticalOptions="CenterAndExpand">
                             <Label Text="Shares"
                                    FontSize="14"
-                                   TextColor="Black" 
+                                   TextColor="White" 
                                    HorizontalTextAlignment="Center"
                                    VerticalTextAlignment="Center"/>
                         </StackLayout>
-                        <StackLayout Grid.Column="1">
+                        <StackLayout Grid.Column="1"
+                                     BackgroundColor="#77d065">
                             <Label Text="Valid" 
-                                   TextColor="Black" 
+                                   TextColor="White"
                                    HorizontalTextAlignment="Center"/>
                             <Label Text="{Binding Path=CurrentStats.data.validShares}" 
-                                   TextColor="Black"
+                                   TextColor="White"
                                    HorizontalTextAlignment="Center" />
                         </StackLayout>
-                        <StackLayout Grid.Column="2" >
+                        <StackLayout Grid.Column="2"
+                                     BackgroundColor="#ffa500" >
                             <Label Text="Stale" 
-                                   TextColor="Black"
+                                   TextColor="White"
                                    HorizontalTextAlignment="Center"/>
                             <Label Text="{Binding Path=CurrentStats.data.staleShares}" 
-                                   TextColor="Black"
+                                   TextColor="White"
                                    HorizontalTextAlignment="Center" />
                         </StackLayout>
-                        <StackLayout Grid.Column="3" >
+                        <StackLayout Grid.Column="3"
+                                     BackgroundColor="#b53737">
                             <Label Text="Invalid" 
-                                   TextColor="Black"
+                                   TextColor="White"
                                    HorizontalTextAlignment="Center" />
                             <Label Text="{Binding Path=CurrentStats.data.invalidShares}" 
-                                   TextColor="Black"
+                                   TextColor="White"
                                    HorizontalTextAlignment="Center" />
                         </StackLayout>
                     </Grid>
@@ -102,24 +110,139 @@
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" 
                                Text="Unpaid balance" 
-                               TextColor="Black"
+                               TextColor="White"
                                FontSize="16"
                                HorizontalTextAlignment="Start">
                         </Label>
                         <Label Grid.Column="1" 
                                Text="{Binding Path=CurrentStats.data.unpaid}" 
-                               TextColor="Black"
+                               TextColor="White"
+                               FontSize="16"
+                               HorizontalTextAlignment="End">
+                        </Label>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" 
+                               Text="Updated at" 
+                               TextColor="White"
+                               FontSize="16"
+                               HorizontalTextAlignment="Start">
+                        </Label>
+                        <!-- ReSharper disable once Xaml.InvalidType -->
+                        <Label Grid.Column="1" 
+                               Text="{Binding Path=CurrentStats.data.time,
+                                              Mode=OneWay, 
+                                              Converter={converter:UnixToDateConverter}}"
+                               TextColor="White"
                                FontSize="16"
                                HorizontalTextAlignment="End">
                         </Label>
                     </Grid>
                 </StackLayout>
                 <StackLayout Grid.Row="1" x:Name="ChartContainer" VerticalOptions="StartAndExpand">
-                    <forms:ChartView x:Name="ChartView" 
-                                     Chart="{Binding CurrentLineChart}"
-                                     HeightRequest="250"/>
+                    <Grid>
+                        <forms:ChartView x:Name="CurrentChartView" 
+                                         Chart="{Binding CurrentLineChart}"
+                                         HeightRequest="250"
+                                         Grid.Row="0"
+                                         Grid.Column="0"/>
+                        <forms:ChartView x:Name="ReportedChartView" 
+                                         Chart="{Binding ReportedLineChart}"
+                                         HeightRequest="250"
+                                         Grid.Row="0"
+                                         Grid.Column="0"/>
+                    </Grid>
                 </StackLayout>
-                <StackLayout Grid.Row="2" x:Name="CoinRates" VerticalOptions="End">
+                <StackLayout Grid.Row="2" HeightRequest="200">
+                    <ScrollView>
+                        <ListView ItemsSource="{Binding CurrentDashboard.data.workers}"
+                                  RowHeight="32"
+                                  HeightRequest="{Binding WorkersListHeight}"
+                                  x:Name="WorkersListView">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <ViewCell>
+                                        <!-- <ViewCell.ContextActions> -->
+                                        <!--     <MenuItem Text="Delete" -->
+                                        <!--               Command="{Binding Source={x:Reference MySettingsPage},  -->
+                                        <!--                                 Path=BindingContext.DeleteCommand}" -->
+                                        <!--               CommandParameter="{Binding .}"/> -->
+                                        <!-- </ViewCell.ContextActions> -->
+                                        <ViewCell.View>
+                                            <Grid Padding="30,0,30,0">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"></RowDefinition>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="5*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="3*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="3*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="2*"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <Label Grid.Row="0" 
+                                                       Grid.Column="0" 
+                                                       Text="{Binding worker}" 
+                                                       FontSize="13"
+                                                       HorizontalTextAlignment="Center"
+                                                       VerticalTextAlignment="Center"/>
+                                                <Label Grid.Row="0" 
+                                                       Grid.Column="1" 
+                                                       Text="{Binding currentHashrate}" 
+                                                       FontSize="13"
+                                                       HorizontalTextAlignment="Center"
+                                                       VerticalTextAlignment="Center"/>
+                                                <Label Grid.Row="0" 
+                                                       Grid.Column="2" 
+                                                       Text="{Binding reportedHashrate}" 
+                                                       FontSize="13"
+                                                       HorizontalTextAlignment="Center"
+                                                       VerticalTextAlignment="Center"/>
+                                                <Label Grid.Row="0" 
+                                                       Grid.Column="3" 
+                                                       Text="{Binding validShares}" 
+                                                       FontSize="13"
+                                                       BackgroundColor="#77d065"
+                                                       HorizontalTextAlignment="Center"
+                                                       VerticalTextAlignment="Center"/>
+                                                <Label Grid.Row="0" 
+                                                       Grid.Column="4" 
+                                                       Text="{Binding staleShares}" 
+                                                       FontSize="13"
+                                                       BackgroundColor="#ffa500"
+                                                       HorizontalTextAlignment="Center"
+                                                       VerticalTextAlignment="Center"/>
+                                                <Label Grid.Row="0" 
+                                                       Grid.Column="5" 
+                                                       Text="{Binding invalidShares}" 
+                                                       FontSize="13"
+                                                       BackgroundColor="#b53737"
+                                                       HorizontalTextAlignment="Center"
+                                                       VerticalTextAlignment="Center"/>
+                                                <!-- ReSharper disable once Xaml.InvalidType -->
+                                                <Label Grid.Row="0" 
+                                                       Grid.Column="6" 
+                                                       Text="{Binding lastSeen,
+                                                              Converter={converter:UnixToMinutesFromNowConverter}}" 
+                                                       FontSize="13"
+                                                       HorizontalTextAlignment="Center"
+                                                       VerticalTextAlignment="Center"/>
+                                            </Grid>
+                                        </ViewCell.View>
+                                    </ViewCell>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </ScrollView>
+                </StackLayout>
+                
+                <StackLayout Grid.Row="3" x:Name="CoinRates" VerticalOptions="End">
                     <Grid Padding="10,10,10,20">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"></RowDefinition>
@@ -140,12 +263,12 @@
                         <Label Grid.Row="1" 
                                Grid.Column="0" 
                                Text="{Binding EthUsdRate}"
-                               TextColor="Black"
+                               TextColor="White"
                                HorizontalTextAlignment="Center"/>
                         <Label Grid.Row="1" 
                                Grid.Column="1" 
                                Text="{Binding EthBtcRate}"
-                               TextColor="Black"
+                               TextColor="White"
                                HorizontalTextAlignment="Center"/>
                     </Grid>
                 </StackLayout>

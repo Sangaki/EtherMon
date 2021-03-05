@@ -4,7 +4,7 @@ using Xamarin.Forms;
 
 namespace EtherMon
 {
-    public partial class AppShell : Xamarin.Forms.Shell
+    public partial class AppShell
     {
         public AppShell()
         {
@@ -15,8 +15,8 @@ namespace EtherMon
 
         private async void OnSettingsItemClicked(object sender, EventArgs e)
         {
-            Shell.Current.FlyoutIsPresented = false;
-            await Shell.Current.GoToAsync($"/{nameof(SettingsPage)}");
+            Current.FlyoutIsPresented = false;
+            await Current.GoToAsync($"/{nameof(SettingsPage)}");
         }
     }
 }

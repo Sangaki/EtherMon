@@ -3,7 +3,7 @@ using Xamarin.Forms;
 
 namespace EtherMon
 {
-    public partial class App : Application
+    public partial class App
     {
         public App()
         {

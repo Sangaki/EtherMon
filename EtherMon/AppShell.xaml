@@ -20,9 +20,23 @@
             <Style TargetType="TabBar" BasedOn="{StaticResource BaseStyle}" />
             <Style TargetType="FlyoutItem" BasedOn="{StaticResource BaseStyle}" />
             
-            <Style Class="FlyoutItemLabelStyle" TargetType="Label">
+            <Style TargetType="ContentPage">
+                <Setter Property="BackgroundColor" Value="Teal"></Setter>
+            </Style>
+            <Style TargetType="StackLayout">
+                <Setter Property="BackgroundColor" Value="Teal"></Setter>
+            </Style>
+            <Style TargetType="ScrollView">
+                <Setter Property="BackgroundColor" Value="Teal"></Setter>
+            </Style>
+            <Style TargetType="Grid">
+                <Setter Property="BackgroundColor" Value="Teal"></Setter>
+            </Style>
+            
+            <Style TargetType="Label">
                 <Setter Property="TextColor" Value="White"></Setter>
             </Style>
+            
             <Style Class="FlyoutItemLayoutStyle" TargetType="Layout" ApplyToDerivedTypes="True">
                 <Setter Property="BackgroundColor" Value="LightBlue"></Setter>
                 <Setter Property="VisualStateManager.VisualStateGroups">

@@ -1,4 +1,5 @@
 ﻿using System;
+using EtherMon.Extensions;
 
 namespace EtherMon.Models.Ethermine
 {

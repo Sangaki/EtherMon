@@ -10,13 +10,13 @@ namespace EtherMon.Services
 {
     public class AddressesDataStore : IDataStore<MinerAddress>
     {
-        static readonly Lazy<SQLiteAsyncConnection> lazyInitializer = new Lazy<SQLiteAsyncConnection>(() =>
+        static readonly Lazy<SQLiteAsyncConnection> LazyInitializer = new Lazy<SQLiteAsyncConnection>(() =>
         {
             return new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
         });
 
-        private static SQLiteAsyncConnection Database => lazyInitializer.Value;
-        static bool initialized = false;
+        private static SQLiteAsyncConnection Database => LazyInitializer.Value;
+        private static bool _initialized;
 
         public AddressesDataStore()
         {
@@ -25,13 +25,13 @@ namespace EtherMon.Services
 
         private static async Task InitializeAsync()
         {
-            if (!initialized)
+            if (!_initialized)
             {
                 if (Database.TableMappings.All(m => m.MappedType.Name != nameof(MinerAddress)))
                 {
                     await Database.CreateTablesAsync(CreateFlags.None, typeof(MinerAddress)).ConfigureAwait(false);
                 }
-                initialized = true;
+                _initialized = true;
             }
         }
         
@@ -54,10 +54,10 @@ namespace EtherMon.Services
         
         public async Task<MinerAddress?> GetItemAsync()
         {
-            var favourite_address = await Database.Table<MinerAddress>().Where(a => a.IsFavourite).FirstOrDefaultAsync();
-            if (favourite_address != null) return favourite_address;
-            var any_address = await Database.Table<MinerAddress>().FirstOrDefaultAsync();
-            return any_address;
+            var favouriteAddress = await Database.Table<MinerAddress>().Where(a => a.IsFavourite).FirstOrDefaultAsync();
+            if (favouriteAddress != null) return favouriteAddress;
+            var anyAddress = await Database.Table<MinerAddress>().FirstOrDefaultAsync();
+            return anyAddress;
         }
 
         public async Task<List<MinerAddress>> GetItemsAsync()

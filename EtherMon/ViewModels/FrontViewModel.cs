@@ -5,10 +5,12 @@ using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using EtherMon.Clients;
+using EtherMon.Extensions;
 using EtherMon.Models;
 using EtherMon.Models.Ethermine;
 using EtherMon.Services;
 using Microcharts;
+using SkiaSharp;
 using Xamarin.Forms;
 
 namespace EtherMon.ViewModels
@@ -16,16 +18,17 @@ namespace EtherMon.ViewModels
     public class FrontViewModel : BaseViewModel
     {
         public List<MinerAddress> ExistingAddresses { get; private set; }
-        public string? CurrentAddress;
-        private EthermineClient _ethermineClient;
-        private AddressesDataStore _addressesDataStore;
         public Statistics? CurrentStats { get; private set; }
         public Dashboard? CurrentDashboard { get; private set; }
         public PoolStatistic? CurrentPoolInfo { get; private set; }
-        public LineChart? CurrentLineChart { get; private set; }
+        public LineChart? CurrentLineChart { get; }
+        public LineChart? ReportedLineChart { get; }
         public string? EthUsdRate { get; private set; }
         public string? EthBtcRate { get; private set; }
-        
+        public string? CurrentAddress;
+        private EthermineClient _ethermineClient;
+        private AddressesDataStore _addressesDataStore;
+        private DateTime? _lastMinerRequestDate;
         private bool _isRefreshing;
         public ICommand RefreshCommand { get; }
         public bool IsRefreshing
@@ -35,6 +38,16 @@ namespace EtherMon.ViewModels
             {
                 _isRefreshing = value;
                 OnPropertyChanged(nameof(IsRefreshing));
+            }
+        }
+        private int _height;
+        public int WorkersListHeight
+        {
+            get => _height;
+            set
+            {
+                _height = value;
+                OnPropertyChanged("WorkersListHeight");
             }
         }
         private async void ExecuteRefreshCommand()
@@ -50,6 +63,22 @@ namespace EtherMon.ViewModels
             
             _addressesDataStore = DependencyService.Get<AddressesDataStore>();
             _ethermineClient = new EthermineClient();
+            WorkersListHeight = 0;
+            
+            CurrentLineChart = new LineChart();
+            CurrentLineChart.LineMode = LineMode.Straight;
+            CurrentLineChart.PointSize = 1;
+            CurrentLineChart.IsAnimated = false;
+            CurrentLineChart.BackgroundColor = SKColor.Empty;
+            
+            ReportedLineChart = new LineChart();
+            ReportedLineChart.LineMode = LineMode.Straight;
+            ReportedLineChart.PointSize = 1;
+            ReportedLineChart.IsAnimated = false;
+            ReportedLineChart.BackgroundColor = SKColor.Empty;
+            
+            if (CurrentLineChart != null) CurrentLineChart.Entries = new List<ChartEntry>();
+            if (ReportedLineChart != null) ReportedLineChart.Entries = new List<ChartEntry>();
             
             RefreshCommand = new Command(ExecuteRefreshCommand);
             
@@ -63,7 +92,7 @@ namespace EtherMon.ViewModels
         
         public void OnSelectedAddressChanged(object? pickerSelectedItem)
         {
-            Debug.WriteLine(pickerSelectedItem!.ToString());
+            _lastMinerRequestDate = null;
             AsyncInitializer(pickerSelectedItem!.ToString());
         }
         
@@ -79,7 +108,6 @@ namespace EtherMon.ViewModels
         {
             CurrentStats = null;
             CurrentDashboard = null;
-            CurrentLineChart = new LineChart();
             
             if (string.IsNullOrEmpty(CurrentAddress)) return;
             
@@ -94,13 +122,25 @@ namespace EtherMon.ViewModels
 
         public async Task UpdateData()
         {
-            Debug.WriteLine("Updating data");
-            CurrentLineChart = new LineChart();
+            if (_lastMinerRequestDate != null && DateTime.Now.AddMinutes(-2) < _lastMinerRequestDate)
+            {
+                MessagingCenter.Send(this, "two_minutes_caching_warning");
+                return;
+            }
             
+            Debug.WriteLine("Updating data");
+            IsRefreshing = true;
+
             CurrentStats = await _ethermineClient.GetStatisticData();
             OnPropertyChanged("CurrentStats");
             
             CurrentDashboard = await _ethermineClient.GetDashboardData();
+            if (CurrentDashboard?.data != null)
+            {
+                CurrentDashboard.data.statistics =
+                    StatsExtensions.GetFilledUpAndClearedStats(CurrentDashboard.data.statistics);
+                WorkersListHeight = CurrentDashboard.data!.workers!.Count * 32;
+            }
             OnPropertyChanged("CurrentDashboard");
             
             ExistingAddresses = await _addressesDataStore.GetItemsAsync();
@@ -109,35 +149,65 @@ namespace EtherMon.ViewModels
             await UpdatePoolInfo();
             UpdateChart();
             
+            IsRefreshing = false;
+            _lastMinerRequestDate = DateTime.Now;
             Debug.WriteLine("Data Updated");
         }
 
         private void UpdateChart()
         {
-            Debug.WriteLine("Updating chart");
+            Debug.WriteLine("Updating charts");
             
-            var entries = new List<ChartEntry>();
+            var currentHsEntries = new List<ChartEntry>();
+            var reportedHsEntries = new List<ChartEntry>();
 
             if (CurrentDashboard?.data == null)
-            { 
-                entries.Add(new ChartEntry(0));
-                CurrentLineChart = new LineChart {Entries = entries};
+            {
+                if (CurrentLineChart != null) CurrentLineChart.Entries = currentHsEntries;
+                if (ReportedLineChart != null) ReportedLineChart.Entries = currentHsEntries;
                 OnPropertyChanged("CurrentLineChart");
                 return;
             }
 
-            CurrentDashboard.data.statistics.ForEach(s =>
+            double maxCurrentHashrate = 0;
+            double maxReportedHashrate = 0;
+            
+            CurrentDashboard.data.statistics?.ForEach(s =>
             {
-                entries.Add(new ChartEntry(float.Parse(s.currentHashrate.ToString())));
+                if (s.currentHashrate > maxCurrentHashrate) maxCurrentHashrate = s.currentHashrate.Value;
+                if (s.reportedHashrate > maxReportedHashrate) maxReportedHashrate = s.reportedHashrate.Value;
+                
+                currentHsEntries.Add(new ChartEntry(float.Parse(s.currentHashrate.ToString()))
+                {
+                    Color = SKColor.Parse("#77d065")
+                });
+                reportedHsEntries.Add(new ChartEntry(float.Parse(s.reportedHashrate.ToString()))
+                {
+                    Color = SKColor.Parse("#3498db")
+                });
             });
-            CurrentLineChart = new LineChart {Entries = entries};
+
+            var maxChartValue = Math.Round(Math.Max(maxCurrentHashrate, maxReportedHashrate) * 1.1);
+            if (CurrentLineChart != null)
+            {
+                CurrentLineChart.Entries = currentHsEntries;
+                CurrentLineChart.MaxValue = (float)maxChartValue;
+                CurrentLineChart.MinValue = 0;
+            };
+            if (ReportedLineChart != null)
+            {
+                ReportedLineChart.Entries = reportedHsEntries;
+                ReportedLineChart.MaxValue = (float)maxChartValue;
+                ReportedLineChart.MinValue = 0;
+            };
             OnPropertyChanged("CurrentLineChart");
-            Debug.WriteLine("Chart Updated");
+            OnPropertyChanged("ReportedLineChart");
+            Debug.WriteLine("Charts Updated");
         }
 
         private async Task UpdatePoolInfo()
         {
-            Debug.WriteLine("updating pool info");
+            Debug.WriteLine("Updating pool info");
             CurrentPoolInfo = await _ethermineClient.GetPoolStats();
             
             if (CurrentPoolInfo == null) return;

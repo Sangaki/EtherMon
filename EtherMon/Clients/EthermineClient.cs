@@ -9,12 +9,14 @@ namespace EtherMon.Clients
 {
     public class EthermineClient
     {
-        public string? MinerAddress { get; set; }
-        
-        private DateTime _lastMinerRequestDate { get; set; }
-        private DateTime _lastWorkersRequestDate { get; set; }
+        private string? _minerAddress;
         private static string _baseUrl = "https://api.ethermine.org";
         private HttpClient _httpClient;
+        public string? MinerAddress
+        {
+            get => _minerAddress;
+            set => _minerAddress = value;
+        }
         
         public EthermineClient(string? address = null)
         {
@@ -51,7 +53,7 @@ namespace EtherMon.Clients
 
             try
             {
-                Statistics stats = JsonConvert.DeserializeObject<Statistics>(responseContent);            
+                Statistics stats = JsonConvert.DeserializeObject<Statistics>(responseContent);
                 return stats;
             }
             catch (Exception e)

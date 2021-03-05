@@ -12,23 +12,24 @@ namespace EtherMon.ViewModels
     {
         public IDataStore<MinerAddress> DataStore => DependencyService.Get<IDataStore<MinerAddress>>();
 
-        bool isBusy = false;
+        private bool _isBusy = false;
         public bool IsBusy
         {
-            get { return isBusy; }
-            set { SetProperty(ref isBusy, value); }
+            get => _isBusy;
+            set => SetProperty(ref _isBusy, value);
         }
 
-        string title = string.Empty;
-        public string Title
+        private string _title = string.Empty;
+
+        protected string Title
         {
-            get { return title; }
-            set { SetProperty(ref title, value); }
+            get { return _title; }
+            set { SetProperty(ref _title, value); }
         }
 
-        protected bool SetProperty<T>(ref T backingStore, T value,
+        private bool SetProperty<T>(ref T backingStore, T value,
             [CallerMemberName] string propertyName = "",
-            Action onChanged = null)
+            Action? onChanged = null)
         {
             if (EqualityComparer<T>.Default.Equals(backingStore, value))
                 return false;
@@ -40,14 +41,12 @@ namespace EtherMon.ViewModels
         }
 
         #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             var changed = PropertyChanged;
-            if (changed == null)
-                return;
 
-            changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            changed?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
     }
