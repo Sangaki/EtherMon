@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:EtherMon.ViewModels;assembly=EtherMon"
+             xmlns:converter="clr-namespace:EtherMon.Converters"
+             x:Class="EtherMon.Views.SettingsPage"
+             x:Name="MySettingsPage"
+             Title="Settings">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackLayout Grid.Row="0" Orientation="Vertical" 
+                         Padding="30,10,30,10" 
+                         Spacing="10">
+                <Label Text="Add new miner (ETH)" FontSize="Title" TextColor="Black" />
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <RadioButton Content="Pool" TextColor="Black" Grid.Row="0" Grid.Column="0" IsChecked="True"/>
+                    <RadioButton Content="Solo" TextColor="Black" Grid.Row="0" Grid.Column="1" x:Name="SoloRadio"/>
+                </Grid>
+                <Entry Placeholder="Address"
+                       x:Name="AddressEntry"
+                       IsTextPredictionEnabled="False" 
+                       TextColor="Black"
+                       PlaceholderColor="Gray">
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroup x:Name="ValidStates">
+                            <VisualState x:Name="Valid">
+                                <VisualState.Setters>
+                                    <Setter Property="TextColor" Value="Black" />
+                                </VisualState.Setters>
+                            </VisualState>
+     
+                            <VisualState x:Name="Invalid">
+                                <VisualState.Setters>
+                                    <Setter Property="TextColor" Value="Red" />
+                                    <Setter Property="Placeholder" Value="Address (required)" />
+                                    <Setter Property="PlaceholderColor" Value="Red" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateManager.VisualStateGroups>
+                </Entry>
+                <Button Text="Add" x:Name="AddAddressButton"></Button>
+            </StackLayout>
+            
+            <ScrollView Grid.Row="1">
+                <ListView ItemsSource="{Binding MinerAddresses}"
+                          HeightRequest="{Binding AddressesListHeight}"
+                          ItemTapped="OnItemTapped"
+                          RowHeight="40"
+                          x:Name="AddressesListView">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <ViewCell.ContextActions>
+                                    <MenuItem Text="Delete"
+                                              Command="{Binding Source={x:Reference MySettingsPage}, 
+                                                                Path=BindingContext.DeleteCommand}"
+                                              CommandParameter="{Binding .}"/>
+                                </ViewCell.ContextActions>
+                                <ViewCell.View>
+                                    <Grid Padding="30,0,30,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="7*"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Row="0" 
+                                               Grid.Column="0" 
+                                               Text="{Binding Address}" 
+                                               TextColor="Black"
+                                               FontSize="13"/>
+                                        <!-- ReSharper disable once Xaml.InvalidType -->
+                                        <Label Grid.Row="0" 
+                                               Grid.Column="1" 
+                                               Text="{Binding IsSoloMiner,
+                                                    Mode=OneWay, 
+                                                    Converter={converter:IsSoloValueConverter}}"
+                                               TextColor="Black" />
+                                    </Grid>
+                                </ViewCell.View>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </ScrollView>
+        </Grid>
+</ContentPage>

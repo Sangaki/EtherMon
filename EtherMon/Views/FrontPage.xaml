@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EtherMon.Views.FrontPage"
+             xmlns:forms="clr-namespace:Microcharts.Forms;assembly=Microcharts.Forms">
+    
+    <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                 Command="{Binding RefreshCommand}">
+        <ScrollView>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackLayout Orientation="Vertical" Padding="30,24,30,24" Spacing="10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <StackLayout Grid.Column="0" 
+                                     VerticalOptions="CenterAndExpand"
+                                     Padding="0,0,0,0">
+                            <Label Text="Hashrate,MHs"
+                                   FontSize="14"
+                                   TextColor="Black" 
+                                   HorizontalTextAlignment="Center"
+                                   VerticalTextAlignment="Center"/>
+                        </StackLayout>
+                        <StackLayout Grid.Column="1">
+                            <Label Text="Current" 
+                                   TextColor="Black" 
+                                   HorizontalTextAlignment="Center"/>
+                            <Label Text="{Binding Path=CurrentStats.data.currentHashrate}" 
+                                   TextColor="Black"
+                                   HorizontalTextAlignment="Center" />
+                        </StackLayout>
+                        <StackLayout Grid.Column="2" >
+                            <Label Text="Average" 
+                                   TextColor="Black"
+                                   HorizontalTextAlignment="Center"/>
+                            <Label Text="{Binding Path=CurrentStats.data.averageHashrate}" 
+                                   TextColor="Black"
+                                   HorizontalTextAlignment="Center" />
+                        </StackLayout>
+                        <StackLayout Grid.Column="3" >
+                            <Label Text="Reported" 
+                                   TextColor="Black"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="{Binding Path=CurrentStats.data.reportedHashrate}" 
+                                   TextColor="Black"
+                                   HorizontalTextAlignment="Center" />
+                        </StackLayout>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <StackLayout Grid.Column="0" 
+                                     VerticalOptions="CenterAndExpand">
+                            <Label Text="Shares"
+                                   FontSize="14"
+                                   TextColor="Black" 
+                                   HorizontalTextAlignment="Center"
+                                   VerticalTextAlignment="Center"/>
+                        </StackLayout>
+                        <StackLayout Grid.Column="1">
+                            <Label Text="Valid" 
+                                   TextColor="Black" 
+                                   HorizontalTextAlignment="Center"/>
+                            <Label Text="{Binding Path=CurrentStats.data.validShares}" 
+                                   TextColor="Black"
+                                   HorizontalTextAlignment="Center" />
+                        </StackLayout>
+                        <StackLayout Grid.Column="2" >
+                            <Label Text="Stale" 
+                                   TextColor="Black"
+                                   HorizontalTextAlignment="Center"/>
+                            <Label Text="{Binding Path=CurrentStats.data.staleShares}" 
+                                   TextColor="Black"
+                                   HorizontalTextAlignment="Center" />
+                        </StackLayout>
+                        <StackLayout Grid.Column="3" >
+                            <Label Text="Invalid" 
+                                   TextColor="Black"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="{Binding Path=CurrentStats.data.invalidShares}" 
+                                   TextColor="Black"
+                                   HorizontalTextAlignment="Center" />
+                        </StackLayout>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" 
+                               Text="Unpaid balance" 
+                               TextColor="Black"
+                               FontSize="16"
+                               HorizontalTextAlignment="Start">
+                        </Label>
+                        <Label Grid.Column="1" 
+                               Text="{Binding Path=CurrentStats.data.unpaid}" 
+                               TextColor="Black"
+                               FontSize="16"
+                               HorizontalTextAlignment="End">
+                        </Label>
+                    </Grid>
+                </StackLayout>
+                <StackLayout Grid.Row="1" x:Name="ChartContainer" VerticalOptions="StartAndExpand">
+                    <forms:ChartView x:Name="ChartView" 
+                                     Chart="{Binding CurrentLineChart}"
+                                     HeightRequest="250"/>
+                </StackLayout>
+                <StackLayout Grid.Row="2" x:Name="CoinRates" VerticalOptions="End">
+                    <Grid Padding="10,10,10,20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Row="0" 
+                               Grid.Column="0" 
+                               Text="ETH-USD"
+                               HorizontalTextAlignment="Center"/>
+                        <Label Grid.Row="0" 
+                               Grid.Column="1" 
+                               Text="ETH-BTC"
+                               HorizontalTextAlignment="Center"/>
+                        <Label Grid.Row="1" 
+                               Grid.Column="0" 
+                               Text="{Binding EthUsdRate}"
+                               TextColor="Black"
+                               HorizontalTextAlignment="Center"/>
+                        <Label Grid.Row="1" 
+                               Grid.Column="1" 
+                               Text="{Binding EthBtcRate}"
+                               TextColor="Black"
+                               HorizontalTextAlignment="Center"/>
+                    </Grid>
+                </StackLayout>
+            </Grid>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>
